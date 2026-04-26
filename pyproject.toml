@@ -8,9 +8,8 @@ version = "0.1.0"
 description = "Individual device control for Logitech Litra lights"
 readme = "README.md"
 requires-python = ">=3.6"
-dependencies = ["pyusb"]
+dependencies = ["pyusb", "fastmcp>=3.2.4"]
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["litra_control*"]
-

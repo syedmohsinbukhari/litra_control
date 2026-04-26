@@ -20,7 +20,7 @@ cd ~/workspace/litra_control
 pip install -e .
 ```
 
-Requires: Python 3.6+, pyusb
+Requires: Python 3.6+, pyusb, fastmcp
 
 ## Usage
 
@@ -60,6 +60,67 @@ devices[0].set_name("Desk Lamp")
 - `device.set_temperature(temp)` - Set temperature (2700-6500K)
 - `device.set_name(name)` - Save custom name to config
 - `device.close()` - Close USB session
+
+## MCP Server
+
+This package includes an MCP (Model Context Protocol) server for AI integration with tools like Claude Desktop, Cursor, and other MCP-compatible AI clients.
+
+### Running the Server
+
+```bash
+cd ~/workspace/litra_control
+python mcp_server.py
+```
+
+The server runs on `http://0.0.0.0:8000/mcp` and is accessible on your local network at:
+`http://elcid-raspberry-pi-zero-2w.local:8000/mcp`
+
+### Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `list_lights` | List all connected Litra devices |
+| `get_light_info` | Get status (on/off, brightness, temperature) |
+| `set_light_on` | Turn on a light |
+| `set_light_off` | Turn off a light |
+| `set_brightness` | Set brightness (0-100) |
+| `set_temperature` | Set temperature (2700-6500K) |
+
+### Client Configuration
+
+**Claude Desktop:**
+Add to your Claude Desktop config (typically `~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "litra-control": {
+      "url": "http://elcid-raspberry-pi-zero-2w.local:8000/mcp"
+    }
+  }
+}
+```
+
+**Cursor:**
+Add to your Cursor MCP settings:
+
+```json
+{
+  "mcpServers": {
+    "litra-control": {
+      "url": "http://elcid-raspberry-pi-zero-2w.local:8000/mcp"
+    }
+  }
+}
+```
+
+### Example AI Prompts
+
+Once connected, you can ask your AI assistant:
+- "Turn on the RightLight"
+- "Set LeftLight brightness to 50%"
+- "Set both lights to 4000K"
+- "What's the current status of all lights?"
 
 ## USB Permissions
 
