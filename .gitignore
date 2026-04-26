@@ -31,4 +31,9 @@ Thumbs.db
 htmlcov/
 
 # Local config (device-specific)
-.config/litra_control/devices.json
+.config/litra_control/devices.jsonlitra_control.egg-info/
+.venv/
+venv/
+*.pyc
+__pycache__/
+
