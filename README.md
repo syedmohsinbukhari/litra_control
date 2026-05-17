@@ -120,7 +120,7 @@ Add to `~/.config/opencode/opencode.json`:
   "mcp": {
     "litra_control": {
       "type": "remote",
-      "url": "http://elcid-raspberry-pi-zero-2w.local:8000/mcp",
+      "url": "http://<PI_HOSTNAME>:8000/mcp",
       "enabled": true
     }
   }
@@ -134,7 +134,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 {
   "mcpServers": {
     "litra-control": {
-      "url": "http://elcid-raspberry-pi-zero-2w.local:8000/mcp"
+      "url": "http://<PI_HOSTNAME>:8000/mcp"
     }
   }
 }
@@ -147,7 +147,7 @@ Add to your Cursor MCP settings:
 {
   "mcpServers": {
     "litra-control": {
-      "url": "http://elcid-raspberry-pi-zero-2w.local:8000/mcp"
+      "url": "http://<PI_HOSTNAME>:8000/mcp"
     }
   }
 }
@@ -211,18 +211,18 @@ python http_server.py --host 127.0.0.1 --port 8080
 
 ```bash
 # List lights
-curl http://elcid-raspberry-pi-zero-2w.local:8001/lights
+curl http://<PI_HOSTNAME>:8001/lights
 
 # Turn on a light
-curl -X POST http://elcid-raspberry-pi-zero-2w.local:8001/lights/DeskRightLight/on
+curl -X POST http://<PI_HOSTNAME>:8001/lights/DeskRightLight/on
 
 # Set brightness
-curl -X PATCH http://elcid-raspberry-pi-zero-2w.local:8001/lights/DeskRightLight/brightness \
+curl -X PATCH http://<PI_HOSTNAME>:8001/lights/DeskRightLight/brightness \
   -H "Content-Type: application/json" \
   -d '{"level": 50}'
 
 # Set temperature
-curl -X PATCH http://elcid-raspberry-pi-zero-2w.local:8001/lights/DeskRightLight/temperature \
+curl -X PATCH http://<PI_HOSTNAME>:8001/lights/DeskRightLight/temperature \
   -H "Content-Type: application/json" \
   -d '{"kelvin": 4000}'
 ```
