@@ -2,11 +2,13 @@
 """HTTP REST Server for Litra Control.
 
 Exposes Litra device control as REST endpoints.
-Run with: python http_server.py
-Server runs on http://0.0.0.0:8000/docs (Swagger UI)
+Run with: python http_server.py [--host HOST] [--port PORT]
+Server runs on http://0.0.0.0:8001/docs (Swagger UI) by default
 """
 
+import argparse
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 
@@ -141,4 +143,8 @@ def set_temperature(name: str, body: TemperatureRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=80)
+    parser = argparse.ArgumentParser(description="Litra Control HTTP Server")
+    parser.add_argument("--host", default="0.0.0.0", help="Host to bind to")
+    parser.add_argument("--port", type=int, default=8001, help="Port to bind to")
+    args = parser.parse_args()
+    uvicorn.run(app, host=args.host, port=args.port)
