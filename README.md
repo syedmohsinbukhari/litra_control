@@ -20,7 +20,7 @@ cd ~/workspace/litra_control
 pip install -e .
 ```
 
-Requires: Python 3.6+, pyusb, fastmcp
+Requires: Python 3.6+, pyusb
 
 ## Usage
 
@@ -63,17 +63,41 @@ devices[0].set_name("Desk Lamp")
 
 ## MCP Server
 
-This package includes an MCP (Model Context Protocol) server for AI integration with tools like Claude Desktop, Cursor, and other MCP-compatible AI clients.
+MCP (Model Context Protocol) server for AI integration with tools like Claude Desktop, Cursor, OpenCode, and other MCP-compatible AI clients.
 
 ### Running the Server
 
 ```bash
 cd ~/workspace/litra_control
+source .venv/bin/activate
 python mcp_server.py
 ```
 
-The server runs on `http://0.0.0.0:8000/mcp` and is accessible on your local network at:
-`http://elcid-raspberry-pi-zero-2w.local:8000/mcp`
+**Default:** `http://0.0.0.0:8000/mcp` (streamable-http transport)
+
+### CLI Arguments
+
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `--host` | `0.0.0.0` | Host to bind to |
+| `--port` | `8000` | Port to bind to |
+| `--transport` | `streamable-http` | MCP transport (`stdio`, `sse`, `streamable-http`) |
+
+### Examples
+
+```bash
+# Default (0.0.0.0:8000, streamable-http)
+python mcp_server.py
+
+# Custom port
+python mcp_server.py --port 8080
+
+# STDIO transport (for Claude Desktop)
+python mcp_server.py --transport stdio
+
+# Local only
+python mcp_server.py --host 127.0.0.1 --port 9000
+```
 
 ### Available Tools
 
@@ -88,8 +112,23 @@ The server runs on `http://0.0.0.0:8000/mcp` and is accessible on your local net
 
 ### Client Configuration
 
+**OpenCode:**
+Add to `~/.config/opencode/opencode.json`:
+
+```json
+{
+  "mcp": {
+    "litra_control": {
+      "type": "remote",
+      "url": "http://elcid-raspberry-pi-zero-2w.local:8000/mcp",
+      "enabled": true
+    }
+  }
+}
+```
+
 **Claude Desktop:**
-Add to your Claude Desktop config (typically `~/Library/Application Support/Claude/claude_desktop_config.json`):
+Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
 
 ```json
 {
@@ -121,6 +160,72 @@ Once connected, you can ask your AI assistant:
 - "Set LeftLight brightness to 50%"
 - "Set both lights to 4000K"
 - "What's the current status of all lights?"
+
+## HTTP REST Server
+
+REST API server for controlling Litra lights via HTTP endpoints.
+
+### Running the Server
+
+```bash
+cd ~/workspace/litra_control
+source .venv/bin/activate
+python http_server.py
+```
+
+**Default:** `http://0.0.0.0:8001` (Swagger docs at `/docs`)
+
+### CLI Arguments
+
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `--host` | `0.0.0.0` | Host to bind to |
+| `--port` | `8001` | Port to bind to |
+
+### Examples
+
+```bash
+# Default (0.0.0.0:8001)
+python http_server.py
+
+# Custom port
+python http_server.py --port 9000
+
+# Local only
+python http_server.py --host 127.0.0.1 --port 8080
+```
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | Health check + info |
+| `GET` | `/lights` | List all lights |
+| `GET` | `/lights/{name}` | Get light status |
+| `POST` | `/lights/{name}/on` | Turn on |
+| `POST` | `/lights/{name}/off` | Turn off |
+| `PATCH` | `/lights/{name}/brightness` | Set brightness (body: `{"level": 0-100}`) |
+| `PATCH` | `/lights/{name}/temperature` | Set temperature (body: `{"kelvin": 2700-6500}`) |
+
+### Examples (curl)
+
+```bash
+# List lights
+curl http://elcid-raspberry-pi-zero-2w.local:8001/lights
+
+# Turn on a light
+curl -X POST http://elcid-raspberry-pi-zero-2w.local:8001/lights/DeskRightLight/on
+
+# Set brightness
+curl -X PATCH http://elcid-raspberry-pi-zero-2w.local:8001/lights/DeskRightLight/brightness \
+  -H "Content-Type: application/json" \
+  -d '{"level": 50}'
+
+# Set temperature
+curl -X PATCH http://elcid-raspberry-pi-zero-2w.local:8001/lights/DeskRightLight/temperature \
+  -H "Content-Type: application/json" \
+  -d '{"kelvin": 4000}'
+```
 
 ## USB Permissions
 
